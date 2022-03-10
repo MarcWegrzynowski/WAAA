@@ -2,8 +2,10 @@ class character {
     constructor(HP, level) {
        this.HP = HP;
        this.level = level;
-       this.damage = level*10;
-       this.damageArray = [this.damage, this.damage, this.damage, this.damage, this.damage*2];
+       this.experience = 5000;
+       this.damage = level*3 + 10;
+       this.damageArray = [this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage*2];
+       // 10% crit rate, on crit 2x damage
     }
     //getters
     get getHealth() {
@@ -21,6 +23,12 @@ class character {
     }
     attack(opponent) {
         opponent.applyDamage(this.calculateDMG);
+    }
+    gainXP(xpGained) {
+        this.experience += xpGained;
+        this.level = this.experience/1000;
+        this.setHealth(this.level*10 + 50);
+        //updates level, you gain a level for each 1k xp you have.
     }
 }
 
