@@ -1,0 +1,9 @@
+Use command:
+ts-node index.ts
+
+ALTERNATIVE:
+
+npm run dev  <-- use to open with nodemon (better)
+
+
+This will let the bot run from my pc
