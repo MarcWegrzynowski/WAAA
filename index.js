@@ -29,6 +29,11 @@ client.on('ready', () => {
 })
 
 client.on('messageCreate', message => {
+     if (message.content === '!combatLoop') {
+        let player = new character.character(200, 10, 'player');
+        let enemy = new character.character(100, 10, 'goblin');
+        combatLoop(message, player, enemy);
+    }
     if (message.content.startsWith(prefix)) {
         //commands need ! before them
         const args = message.content.slice(prefix.length).trim().split(/ + /g)
@@ -41,6 +46,20 @@ client.on('messageCreate', message => {
 })
 
 client.login(token)
+
+
+// runs combat in a loop until somebody loses
+var returnObject = {returnValue : 'string'}
+
+async function combatLoop(message, player, enemy) { 
+    while (returnObject.returnValue != "done") {
+        await runCommand(message, '!fightButtons', returnObject)
+        await delay(1000 * 10) //10 seconds to click
+        console.log(returnObject.returnValue)
+        await player.combat(message, player, enemy, returnObject);
+    }
+}
+
 
 //==============================
 //Takes the name of a command and runs the command.
