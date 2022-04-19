@@ -2,9 +2,7 @@ const fs = require('fs')
 const DiscordJS = { Client, Collection, Intents} = require('discord.js')
 const { token } = require('./config.json')
 const Discord = require("discord.js")
-
 const character = require("./classes/character.js")
-
 
 const client = new DiscordJS.Client({
     intents: [ 
@@ -33,13 +31,6 @@ async function delay(ms) {
     return await(new Promise( resolve => setTimeout(resolve, ms) ));
 }
 
-
-//==============================
-//Takes the name of a command and runs the command.
-//  Input 1: The message sent to discord
-//  Input 2: The name of a command to execute
-//  Output: Passes through any values that are returned
-//==============================
 function runCommand(message, nameOfCommand, argument) {
     message.content = nameOfCommand
     const args = message.content.slice(prefix.length).trim().split(/ + /g)
@@ -100,7 +91,7 @@ async function storyLoop(message, array) {
 }
 
 client.on('messageCreate', async message => {
-    if (message.content === '!test') {
+    if (message.content === '!storyLoop') {
         await storyLoop(message, textArray);
         await message.channel.send("Exited Continue Loop");
     }
