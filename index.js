@@ -71,10 +71,40 @@ client.on('ready', () => {
     console.log('The bot is ready')
 })
 
+var player = new character.character(200, 10, 'player');
+player.player = true;
+
+var textArray = ['First Text, Press continue to see second text', 'Second text, Press continue to see third text','Third text, no button after this']
+
+async function storyLoop(message, array) {
+    let story = await message.channel.send("story here");
+    let allowButtonsFlag = true;
+    const continueB = client.commands.get("continueButton");
+    for (let i=0; i < array.length; i++) {
+        await continueB.run(client, message, returnObject, allowButtonsFlag);
+        await delay(1000*10) //10 seconds to click
+        console.log(returnObject.returnValue);
+        if (returnObject.returnValue = 'continue') {
+            story.edit(array[i]);
+            returnObject.returnValue = 'string'
+        }
+    }
+    const deleteB = client.commands.get('deleteButton');
+    await deleteB.run(client, message, returnObject, allowButtonsFlag);
+    await delay(1000*10) //10 sec
+    console.log(returnObject.returnValue);
+    if (returnObject.returnValue === 'delete') {
+        story.delete()
+    }
+    returnObject.returnValue = 'string';
+}
+
 client.on('messageCreate', async message => {
+    if (message.content === '!test') {
+        await storyLoop(message, textArray);
+        await message.channel.send("Exited Continue Loop");
+    }
     if (message.content === '!demo') {
-        let player = new character.character(200, 10, 'player');
-        player.player = true;
         let goblin = new character.character(100, 10, 'goblin');
         let hobGob = new character.character(200, 14, 'Hobgoblin');
 
@@ -135,6 +165,14 @@ client.on('messageCreate', async message => {
             await message.channel.send("THE END")
         }
     }
+    else if (message.content === '!status') {
+        const cmd = client.commands.get('status');
+        cmd.run(client, message, player);
+    }
+    else if (message.content === '!continueButton' || message.content === 'continue') {
+        client.commands.get('continueButton').run(client, message, returnObject);
+        console.log(returnObject.returnValue);
+    }
     else if (message.content.startsWith(prefix)) {
         //commands need ! before them
         const args = message.content.slice(prefix.length).trim().split(/ + /g)
@@ -143,7 +181,6 @@ client.on('messageCreate', async message => {
         if(!command) return
         command.run(client, message, args)
     }
-    
 })
 
 
