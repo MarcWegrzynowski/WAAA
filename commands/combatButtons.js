@@ -3,31 +3,38 @@ const { Interaction, MessageComponentInteraction, MessageActionRow, MessageButto
 ///module.exports.run = async (client, interaction, args) => {}
 //template above when needing async functionality
 
-module.exports.run = async (client, interaction, args) => {
+module.exports.run = async (client, interaction, args, returnObject) => {
     const row = new MessageActionRow()
         .addComponents(
             new MessageButton()
-                .setCustomId('Attack')
+                .setCustomId('attack')
                 .setEmoji('⚔')
                 .setLabel('Attack')
                 .setStyle('SUCCESS')
         )
         .addComponents(
             new MessageButton()
-                .setCustomId('Items')
-                .setEmoji('👝')
-                .setLabel('Items')
-                .setStyle('PRIMARY')
+                .setCustomId('heal')
+                // .setEmoji('')
+                .setLabel('Heal')
+                .setStyle('SUCCESS')
         )
         .addComponents(
             new MessageButton()
-                .setCustomId('Flee')
+                .setCustomId('defend')
+                // .setEmoji('')
+                .setLabel('Defend')
+                .setStyle('SUCCESS')
+        )
+        .addComponents(
+            new MessageButton()
+                .setCustomId('flee')
                 .setEmoji('💨')
                 .setLabel('Flee')
                 .setStyle('DANGER')
         )
         
-    await interaction.reply({
+    let reply = await interaction.reply({
         content: 'Choose your action:',
         ephemeral: true,
         components: [row],
@@ -38,14 +45,26 @@ module.exports.run = async (client, interaction, args) => {
     }
 
     const collector = interaction.channel.createMessageComponentCollector({
-        filter,
+        //filter,
         max: 1,
-        time: 1000 * 60, //60 seconds to confirm choice
+        time: 1000 * 9, //60 seconds to confirm choice
     });
 
     collector.on('collect', async i => {
-        if (i.customId === 'Attack' || i.customId === 'Items' || i.customId === 'Flee') {
-            await i.reply({ content: 'A button was clicked!', components: [] });
+        if (i.customId === 'attack' || i.customId === 'defend' || i.customId === 'heal' || i.customId === 'flee') {
+            // await i.reply({ content: 'A button was clicked!', components: [] });
+            if (i.customId === 'attack') {
+                returnObject.returnValue = 'attack'
+            }
+            else if (i.customId === 'defend') {
+                returnObject.returnValue = 'defend'
+            }
+            else if (i.customId === 'heal') {
+                returnObject.returnValue = 'heal'
+            }
+            else if (i.customId === 'flee') {
+                returnObject.returnValue = 'flee'
+            }
         }
     });
 
@@ -53,30 +72,10 @@ module.exports.run = async (client, interaction, args) => {
         collection.forEach((click) => {
             console.log(click.user.id, click.customId)
         })
-        if (collection.first()?.customId === 'Attack') {
-            //attack opponent
-            interaction.channel?.send({
-                content: 'You attacked',
-            })
-        }
-        else if (collection.first()?.customId === 'Items') {
-            //open items
-            interaction.channel?.send({
-                content: 'You opened your bag',
-            })
-        }
-        else if (collection.first()?.customId === 'Flee') {
-            //flee
-            interaction.channel?.send({
-                content: 'You fled',
-            })
-        }
-        else {
-            //continue waiting for input???
-            console.log('Unknown action performed')
-        }
-        
+        reply.delete();
     });
+
+    
 }
 
 /*
