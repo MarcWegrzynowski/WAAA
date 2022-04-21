@@ -1,6 +1,6 @@
 const { Interaction, MessageComponentInteraction, MessageActionRow, MessageButton } = require('discord.js');
 
-module.exports.run = async (client, interaction, args, argument) => {
+module.exports.run = async (client, interaction, argument) => {
     const row = new MessageActionRow() //first row of buttons
         .addComponents(
             new MessageButton()
