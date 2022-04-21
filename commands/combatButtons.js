@@ -5,7 +5,7 @@ const { Interaction, MessageComponentInteraction, MessageActionRow, MessageButto
 // TODO: fix import for combat / character class, importing combat 
 //       should bring in character class as well
 
-module.exports.run = async (client, interaction, args) => {
+module.exports.run = async (client, interaction) => {
 
     const row = new MessageActionRow()
         .addComponents(

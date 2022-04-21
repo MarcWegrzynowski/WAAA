@@ -1,5 +1,5 @@
 
-module.exports.run = async (client, message, args) => {
+module.exports.run = async (client, message) => {
     // check if you are already in a thread
     if (message.channel.isThread()) {
         message.channel.send("You're already in a thread silly")

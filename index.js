@@ -22,34 +22,24 @@ for (file of commandFiles) {
     client.commands.set(commandName, command)
 }
 
-//=====================================================
-//Delays the activation of following code
-//  Input 1: Time in milliseconds (1 second = 1000 ms)
-//  Output: N/A
-//=====================================================
+
 async function delay(ms) {
     return await(new Promise( resolve => setTimeout(resolve, ms) ));
 }
 
-function runCommand(message, nameOfCommand, argument) {
-    message.content = nameOfCommand
-    const args = message.content.slice(prefix.length).trim().split(/ + /g)
-    const commandName = args.shift()
-    const command = client.commands.get(commandName)
-
-    if(!command) {
-        message.channel.send('Error: what was passed through was NOT a command, check your syntax')
-        return
+async function runCommand(message, nameOfCommand, argument) {
+    const command = client.commands.get(nameOfCommand);
+    if (!command) {
+        console.log("That was not a command!")
     }
-
-    return command.run(client, message, args, argument)
+    await command.run(message, argument);
 }
 
 var returnObject = {returnValue : 'string'}
 
 async function combatLoop(message, player, enemy) { 
     while (returnObject.returnValue != "done") {
-        await runCommand(message, '!fightButtons', returnObject)
+        await runCommand(message, 'fightButtons', returnObject)
         await delay(1000 * 10) //10 seconds to click
         console.log(returnObject.returnValue)
         await player.combat(message, player, enemy, returnObject);
@@ -170,9 +160,13 @@ client.on('messageCreate', async message => {
         const commandName = args.shift()
         const command = client.commands.get(commandName)
         if(!command) return
-        command.run(client, message, args)
+        command.run(client, message)
     }
 })
 
 
+
+//===================================================
+// client.login
+//===================================================
 client.login(token)
