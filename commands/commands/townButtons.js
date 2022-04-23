@@ -4,27 +4,21 @@ module.exports.run = async (client, interaction, argument) => {
     const row = new MessageActionRow() //first row of buttons
         .addComponents(
             new MessageButton()
-                .setCustomId('continue') //you can name their ID whatever is easier for you
+                .setCustomId('townSquare') //you can name their ID whatever is easier for you
                 .setEmoji('⚔') //emoji is optional but neat addition you can add
-                .setLabel('Continue the Loop')
+                .setLabel('Remain in the town suqare')
                 .setStyle('SUCCESS') //color for buttons
         )
         .addComponents(
             new MessageButton()
-                .setCustomId('combat')
-                .setLabel('Begin Combat Test')
+                .setCustomId('alchemist')
+                .setLabel('Go to the alchemist')
                 .setStyle('SECONDARY')
         )
         .addComponents(
             new MessageButton()
-                .setCustomId('end')
-                .setLabel('End the Loop')
-                .setStyle('PRIMARY')
-        )
-        .addComponents(
-            new MessageButton()
-                .setCustomId('town')
-                .setLabel('Head to town')
+                .setCustomId('menu')
+                .setLabel('Leave town')
                 .setStyle('PRIMARY')
         )
         //the four color options for buttons: 'SUCCESS', 'PRIMARY', 'DANGER', 'SECONDARY'
@@ -48,20 +42,17 @@ module.exports.run = async (client, interaction, argument) => {
     });
     
     collector.on('collect', async i => {
-        if (i.customId === 'continue' || i.customId === 'end' || i.customId === 'combat' || i.customId === 'town') {
-            if (i.customId === 'continue') {
+        if (i.customId === 'townSquare' || i.customId === 'alchemist' || i.customId === 'menu') {
+            if (i.customId === 'townSquare') {
                 // await interaction.channel.send('buttonOne was clicked!')
-                argument.customID = 'continue'
+                argument.customID = 'townSquare'
             }
-            else if (i.customId === 'end') {
+            else if (i.customId === 'alchemist') {
                 // await interaction.channel.send('buttonTwo was clicked!')
-                argument.customID = 'end'
+                argument.customID = 'alchemist'
             }
-            else if (i.customId === 'combat') {
-                argument.customID = 'combat'
-            }
-            else if (i.customId === 'town') {
-                argument.customID = 'town'
+            else if (i.customId === 'menu') {
+                argument.customID = 'menu'
             }
         }
     });

@@ -5,12 +5,12 @@ const { Interaction, MessageComponentInteraction, MessageActionRow, MessageButto
 // TODO: fix import for combat / character class, importing combat 
 //       should bring in character class as well
 
-module.exports.run = async (client, interaction) => {
 
+module.exports.run = async (client, interaction, returnObject) => {
     const row = new MessageActionRow()
         .addComponents(
             new MessageButton()
-                .setCustomId('Attack')
+                .setCustomId('attack')
                 .setEmoji('⚔')
                 .setLabel('Attack')
                 .setStyle('SUCCESS')
@@ -31,7 +31,7 @@ module.exports.run = async (client, interaction) => {
         )
         .addComponents(
             new MessageButton()
-                .setCustomId('Flee')
+                .setCustomId('flee')
                 .setEmoji('💨')
                 .setLabel('Flee')
                 .setStyle('DANGER')
@@ -48,29 +48,26 @@ module.exports.run = async (client, interaction) => {
     }
 
     const collector = interaction.channel.createMessageComponentCollector({
-        filter,
+        //filter,
         max: 1,
-        time: 1000 * 60, //60 seconds to confirm choice
+        time: 1000 * 9, //60 seconds to confirm choice
     });
 
     collector.on('collect', async i => {
-        if (i.customId === 'Attack'||i.customId === 'Defend'||i.customId === 'Potion'||i.customId === 'Flee') {
-            if (i.customId === 'Attack') {
-                await i.channel.send({ content: 'Attack was clicked!', components: [] })
-                //attack action
+
+        if (i.customId === 'attack' || i.customId === 'defend' || i.customId === 'heal' || i.customId === 'flee') {
+            // await i.reply({ content: 'A button was clicked!', components: [] });
+            if (i.customId === 'attack') {
+                returnObject.returnValue = 'attack'
             }
-                        
-            if (i.customId === 'Defend') {
-                await i.channel.send({ content: 'Items was clicked!', components: [] })
-                //defend action
+            else if (i.customId === 'defend') {
+                returnObject.returnValue = 'defend'
             }
-            if (i.customId === 'Potion') {
-                await i.channel.send({ content: 'Items was clicked!', components: [] })
-                //heal action
+            else if (i.customId === 'heal') {
+                returnObject.returnValue = 'heal'
             }
-            if (i.customId === 'Flee') {
-                await i.channel.send({ content: 'Flee was clicked!', components: [] })
-                //flee action
+            else if (i.customId === 'flee') {
+                returnObject.returnValue = 'flee'
             }
         }
     });
@@ -79,30 +76,11 @@ module.exports.run = async (client, interaction) => {
         collection.forEach((click) => {
             console.log(click.user.id, click.customId)
         })
-        if (collection.first()?.customId === 'Attack') {
-            //attack opponent
-            interaction.channel?.send({
-                content: 'You attacked',
-            })
-        }
-        else if (collection.first()?.customId === 'Items') {
-            //open items
-            interaction.channel?.send({
-                content: 'You opened your bag',
-            })
-        }
-        else if (collection.first()?.customId === 'Flee') {
-            //flee
-            interaction.channel?.send({
-                content: 'You fled',
-            })
-        }
-        else {
-            //continue waiting for input???
-            console.log('Unknown action performed')
-        }
-        reply.delete()
         //deletes the buttons once action is performed
-        
+       
+        reply.delete();
+
     });
+
+    
 }
