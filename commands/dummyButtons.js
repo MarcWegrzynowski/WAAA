@@ -1,25 +1,37 @@
 const { Interaction, MessageComponentInteraction, MessageActionRow, MessageButton } = require('discord.js');
 
-module.exports.run = async (client, interaction) => {
+module.exports.run = async (client, interaction, argument) => {
     const row = new MessageActionRow() //first row of buttons
         .addComponents(
             new MessageButton()
-                .setCustomId('firstButtonID') //you can name their ID whatever is easier for you
+                .setCustomId('continue') //you can name their ID whatever is easier for you
                 .setEmoji('⚔') //emoji is optional but neat addition you can add
-                .setLabel('WhatUserSeesOne')
+                .setLabel('Continue the Loop')
                 .setStyle('SUCCESS') //color for buttons
         )
         .addComponents(
             new MessageButton()
-                .setCustomId('secondButtonID')
-                .setLabel('WhatUserSeesTwo')
+                .setCustomId('combat')
+                .setLabel('Begin Combat Test')
+                .setStyle('SECONDARY')
+        )
+        .addComponents(
+            new MessageButton()
+                .setCustomId('end')
+                .setLabel('End the Loop')
+                .setStyle('PRIMARY')
+        )
+        .addComponents(
+            new MessageButton()
+                .setCustomId('town')
+                .setLabel('Head to town')
                 .setStyle('PRIMARY')
         )
         //the four color options for buttons: 'SUCCESS', 'PRIMARY', 'DANGER', 'SECONDARY'
         // there is also a style called 'LINK' for links to URLS
         // if your making a link button you also need to add .setURL('https://urlExample.com')
     let reply = await interaction.reply({
-        content: 'Choose your action:',
+        content: '=====================================================\nStanding here, you wonder what your next move will be\n=====================================================',
         components: [row], //if you wish to define more buttonRows you can [rowOne, rowTwo]
         //limit should be 5 rows of buttons and 5 buttons per row
     }) // button prompt
@@ -30,19 +42,26 @@ module.exports.run = async (client, interaction) => {
     }
 
     const collector = interaction.channel.createMessageComponentCollector({
-        filter,
+        // filter,
         max: 1, //change max to allow for multiple button clicks
-        time: 1000 * 60, //60 seconds to confirm choice
+        time: 1000 * 5, //60 seconds to confirm choice
     });
-
+    
     collector.on('collect', async i => {
-        if (i.customId === 'firstButtonID' || i.customId === 'secondButtonID') {
-            if (i.customId === 'firstButtonID') {
-                await i.channel.send('buttonOne was clicked!')
-                //you can run whatever you want afterwards
+        if (i.customId === 'continue' || i.customId === 'end' || i.customId === 'combat' || i.customId === 'town') {
+            if (i.customId === 'continue') {
+                // await interaction.channel.send('buttonOne was clicked!')
+                argument.customID = 'continue'
             }
-            else if (i.customId === 'secondButtonID') {
-                await i.channel.send('buttonTwo was clicked!')
+            else if (i.customId === 'end') {
+                // await interaction.channel.send('buttonTwo was clicked!')
+                argument.customID = 'end'
+            }
+            else if (i.customId === 'combat') {
+                argument.customID = 'combat'
+            }
+            else if (i.customId === 'town') {
+                argument.customID = 'town'
             }
         }
     });
@@ -51,11 +70,9 @@ module.exports.run = async (client, interaction) => {
         collection.forEach((click) => {
             console.log(click.user.id, click.user.username, click.customId)
             //logs userID, and nickname of who clicked button and what action
-            
         })
         
         reply.delete()
         //deletes the buttons once action(s) is/are performed
-
     });
 }

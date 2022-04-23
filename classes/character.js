@@ -8,11 +8,13 @@ class character {
         this.damage = level*3 + 10;
         this.damageArray = [this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage*2];
         // 10% crit rate, on crit 2x damage
+        this.defense = .50 + .01*this.level;
         this.lastDamageDealt = 0;
         this.lastHealAmount = 0;
         this.lastAction = 'attack';
         this.lastXpGained = 0;
         this.levelUp = false;
+        this.potionUses = 10;
         if (name === null) {
             this.name = 'opponent';
         } else {
@@ -52,21 +54,27 @@ class character {
         //damage message
     }
     defend(opponent) {
-        let dmg = opponent.calculateDMG*.25;
+        let dmg = opponent.calculateDMG*(1-defense);
         this.applyDamage(dmg);
         opponent.lastDamageDealt = dmg
         //defend message
         this.lastAction = 'defend';
     }
     heal(){
-        this.HP += this.level*10;
-        //heal message
-        this.lastHealAmount = this.level*10;
-        this.lastAction = 'heal';
+        if (this.potionUses > 0 ) {
+            this.HP += this.level*10;
+            //heal message
+            this.lastHealAmount = this.level*10;
+            this.lastAction = 'heal';
+            this.potionUses -= 1;
+        } else {
+            this.lastHealAmount = 0;
+        }
     }
     updateStats(){
         this.maxHP = this.level*20
         this.damage = this.level*3 + 10
+        this.defense = .50 + .01*this.level
         this.damageArray = [this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage*2];
         this.setHealth(this.level*10 + 50);
     }
@@ -77,6 +85,7 @@ class character {
         let oldMaxHP = this.maxHP;
         let oldDamage = this.damage;
         let oldHeal = this.level*6;
+        let oldDefense = this.defense;
         this.level = Math.floor(this.experience/1000);
         this.updateStats()
         //updates level, you gain a level for each 1k xp you have.
@@ -84,7 +93,7 @@ class character {
         if (oldLevel != this.level) {
             this.levelUp = true;
             this.HP = this.maxHP;
-            message.channel.send(`You leveled up!\nPlayer Level: ${oldLevel} -> ${this.level}\nPlayer HP: ${oldMaxHP} -> ${this.maxHP}\nPlayer Attack: ${oldDamage} -> ${this.damage}\nPlayer Heal: ${oldHeal} -> ${this.level*6}`)
+            message.channel.send(`You leveled up!\nPlayer Level: ${oldLevel} -> ${this.level}\nPlayer HP: ${oldMaxHP} -> ${this.maxHP}\nPlayer Attack: ${oldDamage} -> ${this.damage}\nPlayer Defense %${1-oldDefense} -> %${1-this.defense}\nPlayer Heal: ${oldHeal} -> ${this.level*6}`)
         }
     }
 
@@ -108,7 +117,8 @@ class character {
         } 
         if (userChoice.returnValue === "heal") {
             player.heal()
-            message.channel.send(`You took a sip of your potion to heal ${player.lastHealAmount} HP`)
+            message.channel.send(`You took a sip of your potion to heal ${player.lastHealAmount} HP\nPotion Uses Left: ${player.potionUses}`)
+            if (player.potionUses < 1) { message.channel.send("You realize the bottle is empty!")}
         } 
         if (userChoice.returnValue === "flee") {
             flee = true;
@@ -127,7 +137,9 @@ class character {
 
         //display HP after dmg
         message.channel.send(`Your HP: ${player.getHealth}\nOpponent HP: ${opponent.getHealth}`);
-    
+        if (flee) {
+            userChoice.returnValue = "done"
+        }
         if (player.getHealth <= 0) {
             message.channel.send("**YOU DIED...\nGAME OVER...**")
             console.log("GAME OVER")
@@ -139,26 +151,8 @@ class character {
             console.log("YOU WIN")
             userChoice.returnValue = "done"
         }
-    }   
+    }  
 }
 
 module.exports.character = character;
 
-/*
-//player = new character(1000, 10); //hp = 1000, level = 10
-//enemy = new character (100, 10);
-
-//Class & Class Function Tests
-```All Tests Passed```
-player = new character(1000, 10);
-console.log(player.getHealth)
-console.log(player.calculateDMG)
-player.setHealth(900); // changing health
-console.log(player.getHealth)
-player.applyDamage(500); // recieving damage
-console.log(player.getHealth)
-
-goblin = new character(100, 10);
-player.attack(goblin);
-console.log(goblin.getHealth)
-*/
