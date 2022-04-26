@@ -1,6 +1,5 @@
 const { Interaction, MessageComponentInteraction, MessageActionRow, MessageButton } = require('discord.js');
 
-
 module.exports.run = async (client, interaction, returnObject) => {
 
     const row = new MessageActionRow()
@@ -20,9 +19,9 @@ module.exports.run = async (client, interaction, returnObject) => {
         )
         .addComponents(
             new MessageButton()
-                .setCustomId('Potion')
-                .setEmoji('🍯')
-                .setLabel('Potion')
+                .setCustomId('Items')
+                .setEmoji('👝')
+                .setLabel('Item Bag')
                 .setStyle('SECONDARY')
         )
         .addComponents(
@@ -50,7 +49,7 @@ module.exports.run = async (client, interaction, returnObject) => {
     });
 
     collector.on('collect', async i => {
-        if (i.customId === 'Attack'||i.customId === 'Defend'||i.customId === 'Potion'||i.customId === 'Flee') {
+        if (i.customId === 'Attack'||i.customId === 'Defend'||i.customId === 'Items'||i.customId === 'Flee') {
             if (i.customId === 'Attack') {
                 await i.channel.send({ content: 'Attack was selected!', components: [] })
                 returnObject.returnValue = 'attack'
@@ -61,10 +60,10 @@ module.exports.run = async (client, interaction, returnObject) => {
                 //defend action
                 returnObject.returnValue = 'defend'
             }
-            if (i.customId === 'Potion') {
-                await i.channel.send({ content: 'Potion was selected!', components: [] })
+            if (i.customId === 'Items') {
+                await i.channel.send({ content: 'Items was selected!', components: [] })
                 //heal action
-                returnObject.returnValue = 'heal'
+                returnObject.returnValue = 'items'
             }
             if (i.customId === 'Flee') {
                 await i.channel.send({ content: 'Flee was selected!', components: [] })

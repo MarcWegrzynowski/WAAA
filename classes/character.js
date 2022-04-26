@@ -14,7 +14,8 @@ class character {
         this.lastAction = 'attack';
         this.lastXpGained = 0;
         this.levelUp = false;
-        this.potionUses = 10;
+        this.itemsArray = [1, 1 , 1, 1, 1, 1];
+        // lowP, midP, lowB, midB, lowD, midD
         if (name === null) {
             this.name = 'opponent';
         } else {
@@ -54,21 +55,66 @@ class character {
         //damage message
     }
     defend(opponent) {
-        let dmg = opponent.calculateDMG*(1-defense);
+        let dmg = opponent.calculateDMG*(1-this.defense);
         this.applyDamage(dmg);
         opponent.lastDamageDealt = dmg
         //defend message
         this.lastAction = 'defend';
     }
-    heal(){
-        if (this.potionUses > 0 ) {
+    lowHeal(){
+        if (this.itemsArray[0] > 0 ) {
             this.HP += this.level*10;
             //heal message
             this.lastHealAmount = this.level*10;
             this.lastAction = 'heal';
-            this.potionUses -= 1;
+            this.itemsArray[0] -= 1;
         } else {
             this.lastHealAmount = 0;
+        }
+    }
+    midHeal(){
+        if (this.itemsArray[1] > 0 ) {
+            this.HP += (this.level*10)*1.5; //50% better than regular potion
+            //heal message
+            this.lastHealAmount = (this.level*10)*1.5;
+            this.lastAction = 'heal';
+            this.itemsArray[1] -= 1;
+        } else {
+            this.lastHealAmount = 0;
+        }
+    }
+    angryAle(){
+        if (this.itemsArray[2] > 0 ) {
+            this.damage = this.damage*1.25; // 25% damage increase, for the combat session
+            this.damageArray = [this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage*2];
+            this.itemsArray[2] -= 1;
+        }
+    }
+    ragingAle(){
+        if (this.itemsArray[3] > 0 ) {
+            this.damage = this.damage*1.5; // 50% damage increase, for the combat session
+            this.damageArray = [this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage, this.damage*2];
+            this.itemsArray[3] -= 1;
+        }
+    }
+    throwingKnife(opponent){
+        if (this.itemsArray[4] > 0 ) {
+            opponent.applyDamage(this.damage*1.75) // near critical amounts of damage!
+            this.lastAction = 'attack'
+            this.lastDamageDealt = this.damage*1.75
+            this.itemsArray[4] -= 1;
+        } else {
+            this.lastDamageDealt = 0;
+        }
+    }
+    throwingAxe(opponent){
+        if (this.itemsArray[5] > 0 ) {
+            opponent.applyDamage(this.damage*2.25) // more than critical damage!
+            this.lastAction = 'attack'
+            this.lastDamageDealt = this.damage*2.25
+            this.itemsArray[5] -= 1;
+        } else {
+            this.lastDamageDealt = 0;
         }
     }
     updateStats(){
@@ -98,12 +144,12 @@ class character {
     }
 
 
-    combat(message, player, opponent, userChoice) {
+    async combat(message, player, opponent, userChoice) {
         // prompt player with choices
         // if player choice is to attack, attack
         let flee = false;
 
-        message.channel.send(`Your HP: ${player.getHealth}\nOpponent HP: ${opponent.getHealth}`)
+        let health = await message.channel.send(`Your HP: ${player.getHealth}\nOpponent HP: ${opponent.getHealth}`)
         if (userChoice.returnValue === "attack") {
             //prompt user for small/medium/large potion
             player.attack(message, opponent);
@@ -114,11 +160,51 @@ class character {
             player.defend(opponent);
             message.channel.send("You braced yourself for an attack")
             message.channel.send(`The opponent did ${opponent.lastDamageDealt} damage`)
+        }
+        if (userChoice.returnValue === 'items') {
+            message.channel.send(`You quickly pull out a...`)
+        }
+        if (userChoice.returnValue === "lowP") {
+            if (player.itemsArray[0] < 1) { message.channel.send("You planned to take a sip of your potion only to realize that the bottle is empty!")}
+            else {
+                player.lowHeal()
+                message.channel.send(`You took a sip of your potion to heal ${player.lastHealAmount} HP\nPotion Uses Left: ${player.itemsArray[0]}`)
+            }
         } 
-        if (userChoice.returnValue === "heal") {
-            player.heal()
-            message.channel.send(`You took a sip of your potion to heal ${player.lastHealAmount} HP\nPotion Uses Left: ${player.potionUses}`)
-            if (player.potionUses < 1) { message.channel.send("You realize the bottle is empty!")}
+        if (userChoice.returnValue === "midP") {
+            if (player.itemsArray[0] < 1) { message.channel.send("You planned to take a sip of your potion only to realize that the bottle is empty!")}
+            else {
+                player.midHeal()
+                message.channel.send(`You took a sip of your potion to heal ${player.lastHealAmount} HP\nPotion Uses Left: ${player.itemsArray[1]}`)
+            }
+        } 
+        if (userChoice.returnValue === "lowB") {
+            if (player.itemsArray[2] < 1) { message.channel.send("You planned to take a sip of angry ale just to realize the ale jug was empty!")}
+            else {
+                player.angryAle();
+                message.channel.send(`You took a sip of your angry ale to buff your damage! Damage: ${player.level*3+10} -> ${player.damage}\nAngry Ale Uses Left: ${player.itemsArray[2]}`)
+            }
+        }
+        if (userChoice.returnValue === "midB") {
+            if (player.itemsArray[2] < 1) { message.channel.send("You planned to take a sip of raging ale just to realize the ale jug was empty!")}
+            else {
+                player.ragingAle();
+                message.channel.send(`You took a sip of your raging ale to buff your damage! Damage: ${player.level*3+10} -> ${player.damage}\nRaging Ale Uses Left: ${player.itemsArray[3]}`)
+            }
+        }
+        if (userChoice.returnValue === "lowD") {
+            if (player.itemsArray[4] < 1) { message.channel.send("You planned to throw a knife at them quickly and skillfully but then you realized you're out of them!")}
+            else {
+                player.throwingKnife(opponent)
+                message.channel.send(`You quickly throw a knife at the ${opponent.name} dealing ${player.lastDamageDealt} damage!\nThrowing Knives Left: ${player.itemsArray[4]}`)
+            }  
+        } 
+        if (userChoice.returnValue === "midD") {
+            if (player.itemsArray[4] < 1) { message.channel.send("You planned to throw an axe at them quickly and skillfully but then you realized you're out of them!")}
+            else {
+                player.throwingAxe(opponent)
+                message.channel.send(`You quickly throw an axe at the ${opponent.name} dealing a devastating ${player.lastDamageDealt} damage!\nThrowing Axes Left: ${player.itemsArray[5]}`)
+            }
         } 
         if (userChoice.returnValue === "flee") {
             flee = true;
@@ -131,12 +217,14 @@ class character {
         
         // after player choice 
         if (userChoice.returnValue != "defend" && flee != true && opponent.getHealth > 0) {
-            opponent.attack(message, player);
-            message.channel.send(`The ${opponent.name} attacked you!\nThey dealt ${opponent.lastDamageDealt} damage`)
+            if (userChoice.returnValue != "items") {
+                opponent.attack(message, player);
+                message.channel.send(`The ${opponent.name} attacked you!\nThey dealt ${opponent.lastDamageDealt} damage`)
+            }
         }
 
         //display HP after dmg
-        message.channel.send(`Your HP: ${player.getHealth}\nOpponent HP: ${opponent.getHealth}`);
+        health.edit(`Your HP: ${player.getHealth}\nOpponent HP: ${opponent.getHealth}`);
         if (flee) {
             userChoice.returnValue = "done"
         }
