@@ -57,6 +57,10 @@ client.on('messageCreate', async message => {
         await storyLoop(message, textArray);
         await message.channel.send("Exited Continue Loop");
     }
+    if (message.content === 'combatLoop') {
+        let enemy = new character.character(200, 10, 'goblin')
+        combatLoop(message, player, enemy)
+    }
     if (message.content === '!demo') {
         let goblin = new character.character(100, 10, 'goblin');
         let hobGob = new character.character(200, 14, 'Hobgoblin');
@@ -173,6 +177,22 @@ async function storyLoop(message, array) {
         story.delete()
     }
     returnObject.returnValue = 'string';
+}
+
+async function combatLoop(message, player, enemy) { 
+    while (returnObject.returnValue != "done") {
+        await runCommand(message, 'fightButtons', returnObject)
+        await delay(1000 * 10) //10 seconds to click
+        console.log(returnObject.returnValue)
+        await player.combat(message, player, enemy, returnObject);
+        if (returnObject.returnValue==='items') {
+            await runCommand(message, 'consumableButtons', returnObject)
+            await delay(1000 * 10) //10 seconds to click
+            await player.combat(message, player, enemy, returnObject);
+            console.log(returnObject.returnValue)
+        }
+    }
+    returnObject.returnValue = 'string'
 }
 
 //==============================
