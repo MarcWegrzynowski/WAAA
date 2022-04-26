@@ -43,21 +43,16 @@ client.on('ready', () => {
 })
 client.login(token)
 
-client.on('messageCreate', message => {
+//==============================================================================
+// Global Variables
+var player = new character.character(200, 10, 'player');
+//==============================================================================
+
+client.on('messageCreate', async message => {
     if (message.content.includes('start') && message.content.startsWith(prefix)) {
         menuFlag = true
         message.channel.send('Starting the game...').then(async(msg) => msg.edit('Started!'))
     }
-    else if (message.content.startsWith(prefix)) {
-        //commands need ! before them
-        const args = message.content.slice(prefix.length).trim().split(/ + /g)
-        const commandName = args.shift()
-        const command = client.commands.get(commandName)
-        
-        if(!command) return
-        command.run(client, message)
-    }
-  
     if (message.content === '!storyLoop') {
         await storyLoop(message, textArray);
         await message.channel.send("Exited Continue Loop");
@@ -126,10 +121,6 @@ client.on('messageCreate', message => {
     else if (message.content === '!status') {
         const cmd = client.commands.get('status');
         cmd.run(client, message, player);
-    }
-    else if (message.content === '!continueButton' || message.content === 'continue') {
-        client.commands.get('continueButton').run(client, message, returnObject);
-        console.log(returnObject.returnValue);
     }
     else if (message.content.startsWith(prefix)) {
         //commands need ! before them
@@ -231,7 +222,6 @@ async function loopMenu(message) {
         // This is so any edited messages don't mess up the combat loop
         menuFlag = false
         message.edit('Beginning Combat loop...')
-        let player = new character.character(200, 10, 'player');
         let enemy = new character.character(100, 10, 'goblin');
         message.edit('Your HP: 200\nOpponent HP: 100')
         while (returnObject.returnValue != "done") {
@@ -305,4 +295,3 @@ async function loopTown(message) {
         await(delay(4000))
     }
 }
-
