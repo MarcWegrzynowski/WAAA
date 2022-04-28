@@ -63,7 +63,7 @@ client.on('ready', () => {
 })
 client.login(token)
 
-client.on('messageCreate', message => {
+client.on('messageCreate', async message => {
     if (message.content === prefix + 'startDemo') {
         gameFlag = true;
         message.channel.send('Starting the game...')
