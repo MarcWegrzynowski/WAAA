@@ -38,11 +38,15 @@ for (file of commandFiles) {
 //  Global Variables
 //=================================================================================
 
+// Angels Variables
+var player = new character.character(200, 10, 'player');
+var returnObject = {returnValue: 'string'}
+
+// Marc's Variables
 let menuFlag = false;
 let townFlag = false;
 let wildFlag = false;
 let gameFlag = false;
-var player = new character.character(200, 10, 'player');
 var botID = '942950840174514206';
 var genericReturnValue = {returnValue : 'null'}
 var townAction = {customID : 'townSquare'}
@@ -64,15 +68,6 @@ client.on('messageCreate', message => {
         gameFlag = true;
         message.channel.send('Starting the game...')
             .then(async(msg) => msg.edit('Started!'))
-    }
-    else if (message.content.startsWith(prefix)) {
-        //commands need ! before them
-        const args = message.content.slice(prefix.length).trim().split(/ + /g)
-        const commandName = args.shift()
-        const command = client.commands.get(commandName)
-        
-        if(!command) return
-        command.run(client, message)
     }
     if (message.content.includes ==='!start') {
         menuFlag = true
@@ -154,6 +149,15 @@ client.on('messageCreate', message => {
     else if (message.content === '!status') {
         const cmd = client.commands.get('status');
         cmd.run(client, message, player);
+    }
+    else if (message.content.startsWith(prefix)) {
+        //commands need ! before them
+        const args = message.content.slice(prefix.length).trim().split(/ + /g)
+        const commandName = args.shift()
+        const command = client.commands.get(commandName)
+        if(!command) return
+        command.run(client, message)
+    }
 }) 
 
 client.on('messageUpdate', message => {
