@@ -69,15 +69,6 @@ client.on('messageCreate', message => {
         message.channel.send('Starting the game...')
             .then(async(msg) => msg.edit('Started!'))
     }
-    else if (message.content.startsWith(prefix)) {
-        //commands need ! before them
-        const args = message.content.slice(prefix.length).trim().split(/ + /g)
-        const commandName = args.shift()
-        const command = client.commands.get(commandName)
-        
-        if(!command) return
-        command.run(client, message)
-    }
     if (message.content.includes ==='!start') {
         menuFlag = true
         message.channel.send('Starting the game...').then(async(msg) => msg.edit('Started!'))
@@ -158,6 +149,15 @@ client.on('messageCreate', message => {
     else if (message.content === '!status') {
         const cmd = client.commands.get('status');
         cmd.run(client, message, player);
+    }
+    else if (message.content.startsWith(prefix)) {
+        //commands need ! before them
+        const args = message.content.slice(prefix.length).trim().split(/ + /g)
+        const commandName = args.shift()
+        const command = client.commands.get(commandName)
+        if(!command) return
+        command.run(client, message)
+    }
 }) 
 
 client.on('messageUpdate', message => {
