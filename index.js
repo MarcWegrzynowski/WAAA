@@ -49,12 +49,16 @@ var player = new character.character(200, 10, 'player');
 //==============================================================================
 
 client.on('messageCreate', async message => {
-    if (message.content.includes('start') && message.content.startsWith(prefix)) {
+    if (message.content.includes ==='!start') {
         menuFlag = true
         message.channel.send('Starting the game...').then(async(msg) => msg.edit('Started!'))
     }
     if (message.content === '!storyLoop') {
         await storyLoop(message, textArray);
+        await message.channel.send("Exited Continue Loop");
+    }
+    if (message.content === '!storyForLoop') {
+        await storyForLoop(message, textArray, 2);
         await message.channel.send("Exited Continue Loop");
     }
     if (message.content === 'combatLoop') {
@@ -157,10 +161,33 @@ client.on('messageUpdate', message => {
 var textArray = ['First Text, Press continue to see second text', 'Second text, Press continue to see third text','Third text, no button after this']
 
 async function storyLoop(message, array) {
-    let story = await message.channel.send("story here");
+    let story = await message.channel.send("``` ```");
     let allowButtonsFlag = true;
     const continueB = client.commands.get("continueButton");
     for (let i=0; i < array.length; i++) {
+        await continueB.run(client, message, returnObject, allowButtonsFlag);
+        await delay(1000*10) //10 seconds to click
+        console.log(returnObject.returnValue);
+        if (returnObject.returnValue = 'continue') {
+            story.edit(array[i]);
+            returnObject.returnValue = 'string'
+        }
+    }
+    const deleteB = client.commands.get('deleteButton');
+    await deleteB.run(client, message, returnObject, allowButtonsFlag);
+    await delay(1000*10) //10 sec
+    console.log(returnObject.returnValue);
+    if (returnObject.returnValue === 'delete') {
+        story.delete()
+    }
+    returnObject.returnValue = 'string';
+}
+
+async function storyForLoop(message, array, iterations) {
+    let story = await message.channel.send("``` ```");
+    let allowButtonsFlag = true;
+    const continueB = client.commands.get("continueButton");
+    for (let i=0; i < iterations; i++) {
         await continueB.run(client, message, returnObject, allowButtonsFlag);
         await delay(1000*10) //10 seconds to click
         console.log(returnObject.returnValue);
