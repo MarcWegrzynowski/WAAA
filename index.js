@@ -38,11 +38,15 @@ for (file of commandFiles) {
 //  Global Variables
 //=================================================================================
 
+// Angels Variables
+var player = new character.character(200, 10, 'player');
+var returnObject = {returnValue: 'string'}
+
+// Marc's Variables
 let menuFlag = false;
 let townFlag = false;
 let wildFlag = false;
 let gameFlag = false;
-var player = new character.character(200, 10, 'player');
 var botID = '942950840174514206';
 var genericReturnValue = {returnValue : 'null'}
 var townAction = {customID : 'townSquare'}
