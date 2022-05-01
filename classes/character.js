@@ -139,7 +139,7 @@ class character {
         if (oldLevel != this.level) {
             this.levelUp = true;
             this.HP = this.maxHP;
-            message.channel.send(`You leveled up!\nPlayer Level: ${oldLevel} -> ${this.level}\nPlayer HP: ${oldMaxHP} -> ${this.maxHP}\nPlayer Attack: ${oldDamage} -> ${this.damage}\nPlayer Defense %${1-oldDefense} -> %${1-this.defense}\nPlayer Heal: ${oldHeal} -> ${this.level*6}`)
+            message.channel.send(`You leveled up!\nPlayer Level: ${oldLevel} -> ${this.level}\nPlayer HP: ${oldMaxHP} -> ${this.maxHP}\nPlayer Attack: ${oldDamage} -> ${this.damage}\nPlayer Defense ${oldDefense}% -> ${this.defense}%\nPlayer Heal: ${oldHeal} -> ${this.level*6}`)
         }
     }
 
@@ -155,65 +155,64 @@ class character {
             player.attack(message, opponent);
             message.channel.send(`You dealt ${player.lastDamageDealt} damage to the ${opponent.name}`)
         } 
-        if (userChoice.returnValue === "defend") {
+        else if (userChoice.returnValue === "defend") {
             //prompt user for small/medium/large potion
             player.defend(opponent);
             message.channel.send("You braced yourself for an attack")
             message.channel.send(`The opponent did ${opponent.lastDamageDealt} damage`)
         }
-        if (userChoice.returnValue === 'items') {
+        else if (userChoice.returnValue === 'items') {
             message.channel.send(`You quickly pull out a...`)
         }
-        if (userChoice.returnValue === "lowP") {
+        else if (userChoice.returnValue === "lowP") {
             if (player.itemsArray[0] < 1) { message.channel.send("You planned to take a sip of your potion only to realize that the bottle is empty!")}
             else {
                 player.lowHeal()
                 message.channel.send(`You took a sip of your potion to heal ${player.lastHealAmount} HP\nPotion Uses Left: ${player.itemsArray[0]}`)
             }
         } 
-        if (userChoice.returnValue === "midP") {
+        else if (userChoice.returnValue === "midP") {
             if (player.itemsArray[0] < 1) { message.channel.send("You planned to take a sip of your potion only to realize that the bottle is empty!")}
             else {
                 player.midHeal()
                 message.channel.send(`You took a sip of your potion to heal ${player.lastHealAmount} HP\nPotion Uses Left: ${player.itemsArray[1]}`)
             }
         } 
-        if (userChoice.returnValue === "lowB") {
+        else if (userChoice.returnValue === "lowB") {
             if (player.itemsArray[2] < 1) { message.channel.send("You planned to take a sip of angry ale just to realize the ale jug was empty!")}
             else {
                 player.angryAle();
                 message.channel.send(`You took a sip of your angry ale to buff your damage! Damage: ${player.level*3+10} -> ${player.damage}\nAngry Ale Uses Left: ${player.itemsArray[2]}`)
             }
         }
-        if (userChoice.returnValue === "midB") {
-            if (player.itemsArray[2] < 1) { message.channel.send("You planned to take a sip of raging ale just to realize the ale jug was empty!")}
+        else if (userChoice.returnValue === "midB") {
+            if (player.itemsArray[3] < 1) { message.channel.send("You planned to take a sip of raging ale just to realize the ale jug was empty!")}
             else {
                 player.ragingAle();
                 message.channel.send(`You took a sip of your raging ale to buff your damage! Damage: ${player.level*3+10} -> ${player.damage}\nRaging Ale Uses Left: ${player.itemsArray[3]}`)
             }
         }
-        if (userChoice.returnValue === "lowD") {
+        else if (userChoice.returnValue === "lowD") {
             if (player.itemsArray[4] < 1) { message.channel.send("You planned to throw a knife at them quickly and skillfully but then you realized you're out of them!")}
             else {
                 player.throwingKnife(opponent)
                 message.channel.send(`You quickly throw a knife at the ${opponent.name} dealing ${player.lastDamageDealt} damage!\nThrowing Knives Left: ${player.itemsArray[4]}`)
             }  
         } 
-        if (userChoice.returnValue === "midD") {
+        else if (userChoice.returnValue === "midD") {
             if (player.itemsArray[4] < 1) { message.channel.send("You planned to throw an axe at them quickly and skillfully but then you realized you're out of them!")}
             else {
                 player.throwingAxe(opponent)
                 message.channel.send(`You quickly throw an axe at the ${opponent.name} dealing a devastating ${player.lastDamageDealt} damage!\nThrowing Axes Left: ${player.itemsArray[5]}`)
             }
         } 
-        if (userChoice.returnValue === "flee") {
+        else if (userChoice.returnValue === "flee") {
             flee = true;
             message.channel.send("You ran away with your tail between your legs while your opponent laughs at you deciding to let you leave...")
         } 
-        if (userChoice.returnValue === 'string') {
-            //if player chooses to attack or otherwise if all else fails they still attack
+        else {
             message.channel.send("You stood still in fear, while you were distracted you got attacked!")
-        } 
+        }
         
         // after player choice 
         if (userChoice.returnValue != "defend" && flee != true && opponent.getHealth > 0) {
@@ -228,12 +227,12 @@ class character {
         if (flee) {
             userChoice.returnValue = "done"
         }
-        if (player.getHealth <= 0) {
+        else if (player.getHealth <= 0) {
             message.channel.send("**YOU DIED...\nGAME OVER...**")
             console.log("GAME OVER")
             userChoice.returnValue = "done"
         }
-        if (opponent.getHealth <= 0 ) {
+        else if (opponent.getHealth <= 0 ) {
             message.channel.send(`You have slayed the ${opponent.name}!\nYou gain ${opponent.level*100} experience for winning!`)
             player.gainXP(message, opponent.level * 100);
             console.log("YOU WIN")

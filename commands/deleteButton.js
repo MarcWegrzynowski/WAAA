@@ -1,6 +1,6 @@
-const { Interaction, MessageComponentInteraction, MessageActionRow, MessageButton } = require('discord.js');
+const { MessageActionRow, MessageButton } = require('discord.js');
 
-module.exports.run = async (client, interaction, returnObject, flag) => {
+module.exports.run = async (interaction, returnObject, flag) => {
     if (flag) {
         const row = new MessageActionRow()
             .addComponents(

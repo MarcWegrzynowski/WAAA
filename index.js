@@ -7,6 +7,7 @@ const { token } = require('./config.json')
 const Discord = require("discord.js")
 const character = require ('./classes/character.js')
 const { start } = require('repl')
+const { resourceUsage } = require('process')
 
 
 //=================================================================================
@@ -42,6 +43,7 @@ for (file of commandFiles) {
 // Angels Variables
 var player = new character.character(200, 10, 'player');
 var returnObject = {returnValue: 'string'}
+var itemObject = {returnValue: 'string'}
 var textArray = ['First Text, Press continue to see second text', 'Second text, Press continue to see third text','Third text, no button after this']
 
 var actOneArray = [
@@ -113,16 +115,20 @@ client.on('messageCreate', async message => {
         let enemy = new character.character(200, 10, 'goblin')
         combatLoop(message, player, enemy)
     }
+    if (message.content === 'combat') {
+        let goblin = new character.character(200, 10, 'goblin');
+        combat(message, player, goblin)
+    }
     */
     if (message.content === '!demo') {
         let goblin = new character.character(100, 10, 'goblin');
         let hobGob = new character.character(200, 14, 'Hobgoblin');
-
+        
         await storyForLoop(message, actOneArray, 4) // 4 iterations
-        await combatLoop(message, player, goblin);
+        await combat(message, player, goblin);
         if (player.HP > 0) { // index 5 to 15, 10 iterations
             await storyForLoop(message, actOneArray, 10, 5) //starts on index 5, 10 iterations
-            await combatLoop(message, player, hobGob);
+            await combat(message, player, hobGob);
         }
         if (player.HP > 0) { //index 16- , 4 iterations
             await storyForLoop(message, actOneArray, 4, 16) //starts on index 16, 4  iterations
@@ -168,13 +174,13 @@ client.on('messageUpdate', message => {
 //  Helper Functions
 //=================================================================================
 
-
+// storyLoop used when you wish to go through an entire array of text
 async function storyLoop(message, array) {
     let story = await message.channel.send("``` ```");
     let allowButtonsFlag = true;
     const continueB = client.commands.get("continueButton");
     for (let i=0; i < array.length; i++) {
-        await continueB.run(client, message, returnObject, allowButtonsFlag);
+        await continueB.run(message, returnObject, allowButtonsFlag);
         await delay(1000*10) //10 seconds to click
         console.log(returnObject.returnValue);
         if (returnObject.returnValue = 'continue') {
@@ -183,7 +189,7 @@ async function storyLoop(message, array) {
         }
     }
     const deleteB = client.commands.get('deleteButton');
-    await deleteB.run(client, message, returnObject, allowButtonsFlag);
+    await deleteB.run(message, returnObject, allowButtonsFlag);
     await delay(1000*10) //10 sec
     console.log(returnObject.returnValue);
     if (returnObject.returnValue === 'delete') {
@@ -192,13 +198,16 @@ async function storyLoop(message, array) {
     returnObject.returnValue = 'string';
 }
 
+// storyForLoop used when wanting to go through a portion of text from an array and not the whole array
 async function storyForLoop(message, array, iterations, startIndex = 0) {
     let story = await message.channel.send("``` ```");
     let allowButtonsFlag = true;
     const continueB = client.commands.get("continueButton");
     for (let i = startIndex; i < (iterations + startIndex + 1); i++) {
-        await continueB.run(client, message, returnObject, allowButtonsFlag);
-        await delay(1000*10) //10 seconds to click
+        await continueB.run(message, returnObject, allowButtonsFlag);
+        while (returnObject.returnValue === 'string') {
+            await delay(1000)
+        }
         console.log(returnObject.returnValue);
         if (returnObject.returnValue = 'continue') {
             story.edit(array[i]);
@@ -206,8 +215,10 @@ async function storyForLoop(message, array, iterations, startIndex = 0) {
         }
     }
     const deleteB = client.commands.get('deleteButton');
-    await deleteB.run(client, message, returnObject, allowButtonsFlag);
-    await delay(1000*10) //10 sec
+    await deleteB.run(message, returnObject, allowButtonsFlag);
+    while (returnObject.returnValue === 'string') {
+        await delay(1000)
+    }
     console.log(returnObject.returnValue);
     if (returnObject.returnValue === 'delete') {
         story.delete()
@@ -215,19 +226,56 @@ async function storyForLoop(message, array, iterations, startIndex = 0) {
     returnObject.returnValue = 'string';
 }
 
+//combatLoop can now be replaced by combat function, however if stability issues show up with combat function use combatLoop
 async function combatLoop(message, player, enemy) { 
     while (returnObject.returnValue != "done") {
         await runCommand(message, 'fightButtons', returnObject)
         await delay(1000 * 10) //10 seconds to click
         console.log(returnObject.returnValue)
         await player.combat(message, player, enemy, returnObject);
-        if (returnObject.returnValue==='items') {
+        if (returnObject.returnValue === 'items') {
             await runCommand(message, 'consumableButtons', returnObject)
             await delay(1000 * 10) //10 seconds to click
             await player.combat(message, player, enemy, returnObject);
             console.log(returnObject.returnValue)
         }
     }
+    console.log(returnObject.returnValue);
+    
+}
+
+async function combat(message, player, enemy) { 
+    while (returnObject.returnValue != 'done') {
+        await simpleCommand(message, 'fight', returnObject)
+        console.log(returnObject.returnValue)
+        //input not yet recieved log should say 'string'
+        while (returnObject.returnValue === 'string') {
+            await delay(1000);
+        }    
+        console.log(returnObject.returnValue)
+        //input should be received by now, shown in console
+        await player.combat(message, player, enemy, returnObject)
+        if (returnObject.returnValue === 'done') { break }
+        else {
+            if (returnObject.returnValue != 'items') {
+                returnObject.returnValue = 'string'
+            } else {
+                returnObject.returnValue = 'string'
+                itemObject.returnValue = 'string'
+                console.log(itemObject.returnValue)
+                await simpleCommand(message, 'items', itemObject)
+                while (itemObject.returnValue === 'string') {
+                    await delay(1000);
+                }
+                await player.combat(message, player, enemy, itemObject);
+                console.log(itemObject.returnValue)
+                if (itemObject.returnValue === 'done') { break }
+            }
+        }
+    }
+    console.log(`process ended, value should be done: ${returnObject.returnValue}`)
+    returnObject.returnValue = 'string'
+    console.log(`reset return value to: ${returnObject.returnValue}`)
 }
 
 async function gameIntro(message) {
@@ -241,6 +289,14 @@ async function gameIntro(message) {
     townFlag = true;
     genericReturnValue.returnValue = 'null'
     message.edit('===============================================================================================\nFading rays of light poorly illuminate the forest road, showing a path deeper into the woods. Eventually, you find yourself in a small village.\n===============================================================================================')
+}
+
+function simpleCommand(message, commandName, argument) {
+    const command = client.commands.get(commandName)
+    if (!command) {
+        return("Error running command")
+    }
+    return command.run(message, argument)
 }
 
 //==============================
